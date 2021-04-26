@@ -27,14 +27,14 @@ namespace LinqTutorialC31 {
             // display order: id, total; orderline: product, quantity, price
 
             #region Answer
-            var ordlines = from o in orders
-                           join l in orderlines
-                           on o.Id equals l.OrderId
-                           orderby o.Id
-                           select new {
-                               o.Id, o.Total, l.Product, l.Quantity, l.Price,
-                               Subtotal = l.Quantity * l.Price
-                           };
+            //var ordlines = from o in orders
+            //               join l in orderlines
+            //               on o.Id equals l.OrderId
+            //               orderby o.Id
+            //               select new {
+            //                   o.Id, o.Total, l.Product, l.Quantity, l.Price,
+            //                   Subtotal = l.Quantity * l.Price
+            //               };
             #endregion
 
 
@@ -57,19 +57,20 @@ namespace LinqTutorialC31 {
 
 
 
-            //var custord = from c in customers
-            //              join o in orders
-            //              on c.Id equals o.CustId
-            //              join l in orderlines
-            //              on o.Id equals l.OrderId
-            //              orderby o.Total descending
-            //              group o by o.Id into ord
-            //              select new {
-
-            //              };
-            //foreach(var col in custord) {
-            //    Console.WriteLine($"{col.Id}|{col.Name}|{col.Total}|{col.Product}|{col.Quantity}|{col.Price}");
-            //}
+            var custord = from c in customers
+                          join o in orders
+                          on c.Id equals o.CustId
+                          join l in orderlines
+                          on o.Id equals l.OrderId
+                          orderby o.Total descending
+                          group new { c, o, l } by new { o.Id, o.Total } into grp
+                          select new {
+                              Order = grp.Key.Id, OrderTotal = grp.Key.Total, 
+                              CalcTotal = grp.Sum(x => x.l.Price * x.l.Quantity)
+                          };
+            foreach(var col in custord) {
+                Console.WriteLine($"Order Nbr: {col.Order}, OrderTotal: {col.OrderTotal}, Total: {col.CalcTotal}");
+            }
 
             var numbers = new int[] {
                 8927, 2150, 2883, 2221, 3643, 4126, 5256, 9275, 7016, 1169,
